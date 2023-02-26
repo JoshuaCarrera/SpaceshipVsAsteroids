@@ -1,0 +1,105 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://images/asteroide.png" type="Texture" id=1]
+[ext_resource path="res://Asteroide.gd" type="Script" id=2]
+[ext_resource path="res://images/asteroide2.png" type="Texture" id=3]
+[ext_resource path="res://images/asteroide3.png" type="Texture" id=4]
+[ext_resource path="res://sounds/impacto.wav" type="AudioStream" id=5]
+[ext_resource path="res://images/particula_asteroide.png" type="Texture" id=6]
+
+[sub_resource type="PhysicsMaterial" id=1]
+rough = true
+bounce = 15.0
+
+[sub_resource type="SpriteFrames" id=2]
+animations = [ {
+"frames": [ ExtResource( 4 ) ],
+"loop": true,
+"name": "imagen3",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 3 ) ],
+"loop": true,
+"name": "imagen2",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 1 ) ],
+"loop": true,
+"name": "imagen1",
+"speed": 5.0
+} ]
+
+[sub_resource type="CircleShape2D" id=3]
+radius = 34.4932
+
+[sub_resource type="Gradient" id=8]
+offsets = PoolRealArray( 0, 0.375839 )
+colors = PoolColorArray( 1, 1, 1, 1, 0.294118, 0.192157, 0.192157, 0 )
+
+[node name="Asteroide" type="RigidBody2D" groups=[
+"asteroides",
+]]
+position = Vector2( 458.723, 258.622 )
+collision_layer = 5
+collision_mask = 5
+physics_material_override = SubResource( 1 )
+gravity_scale = 0.0
+linear_damp = 0.0
+angular_damp = 0.0
+script = ExtResource( 2 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="." groups=[
+"asteroides",
+]]
+scale = Vector2( 2.5, 2.5 )
+frames = SubResource( 2 )
+animation = "imagen3"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 3 )
+
+[node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
+rect = Rect2( 0, 0, 1, 1 )
+
+[node name="ParticulasFragmentacion" type="CPUParticles2D" parent="."]
+scale = Vector2( 0.6, 0.6 )
+z_index = 1
+emitting = false
+amount = 10
+lifetime = 2.0
+explosiveness = 1.0
+texture = ExtResource( 6 )
+spread = 180.0
+gravity = Vector2( 0, 0 )
+initial_velocity = 200.0
+color_ramp = SubResource( 8 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="TimerPop" type="Timer" parent="."]
+
+[node name="SonidoImpacto" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = 5.0
+
+[node name="SonidoChoque" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = 2.5
+pitch_scale = 2.5
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource( 3 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[connection signal="body_entered" from="." to="." method="_on_Asteroide_body_entered"]
+[connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_VisibilityNotifier2D_screen_exited"]
+[connection signal="timeout" from="TimerPop" to="." method="_on_TimerPop_timeout"]
+[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]

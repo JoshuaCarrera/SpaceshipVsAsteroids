@@ -1,0 +1,107 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://images/Nave_.png" type="Texture" id=1]
+[ext_resource path="res://Player.gd" type="Script" id=2]
+[ext_resource path="res://sounds/sonido_disparo.wav" type="AudioStream" id=3]
+[ext_resource path="res://sounds/explosion.mp3" type="AudioStream" id=4]
+[ext_resource path="res://images/particula_nave.png" type="Texture" id=5]
+[ext_resource path="res://sounds/motor2.wav" type="AudioStream" id=6]
+
+[sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 32, 32, 32 )
+
+[sub_resource type="SpriteFrames" id=3]
+animations = [ {
+"frames": [ SubResource( 1 ) ],
+"loop": true,
+"name": "normal",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 2 ) ],
+"loop": true,
+"name": "disparando",
+"speed": 2.0
+} ]
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 19.4312
+
+[sub_resource type="Gradient" id=5]
+offsets = PoolRealArray( 0, 0.436242 )
+colors = PoolColorArray( 1, 1, 1, 1, 0.294118, 0.192157, 0.192157, 0 )
+
+[node name="Player" type="KinematicBody2D" groups=[
+"player",
+]]
+scale = Vector2( 0.5, 0.5 )
+script = ExtResource( 2 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+scale = Vector2( 2.5, 2.5 )
+frames = SubResource( 3 )
+animation = "normal"
+playing = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 4 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="Positionbullet" type="Position2D" parent="."]
+position = Vector2( 36.1022, 0 )
+
+[node name="TimerCooldown" type="Timer" parent="."]
+wait_time = 0.45
+one_shot = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+
+[node name="ParticulasExplosion" type="CPUParticles2D" parent="."]
+z_index = 1
+emitting = false
+amount = 10
+lifetime = 2.0
+explosiveness = 1.0
+texture = ExtResource( 5 )
+spread = 180.0
+gravity = Vector2( 0, 0 )
+initial_velocity = 200.0
+color_ramp = SubResource( 5 )
+
+[node name="SonidoDisparo" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+volume_db = -20.0
+
+[node name="SonidoMuerte" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+volume_db = -1.0
+
+[node name="SonidoMotor" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
+volume_db = -10.0
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionSalvado" type="CollisionPolygon2D" parent="Area2D"]
+position = Vector2( 40, 0 )
+polygon = PoolVector2Array( -32.56, -22.3315, 7.5, 0, -32.4943, 22.3196 )
+
+[node name="TimerSalvado" type="Timer" parent="."]
+wait_time = 0.12
+one_shot = true
+
+[node name="TimerAntesDeDisparar" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[connection signal="timeout" from="TimerCooldown" to="." method="_on_TimerCooldown_timeout"]
+[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
+[connection signal="timeout" from="TimerSalvado" to="." method="_on_TimerSalvado_timeout"]
+[connection signal="timeout" from="TimerAntesDeDisparar" to="." method="_on_TimerAntesDeDisparar_timeout"]
